@@ -1,0 +1,75 @@
+spring:
+  application:
+    name: spring-api-showcase
+
+  # ── H2 In-Memory Database ─────────────────────────────────────────
+  datasource:
+    url: jdbc:h2:mem:showcase;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop    # auto-creates schema from entities
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console          # Browse DB at http://localhost:8080/h2-console
+
+  # ── GraphQL Configuration ─────────────────────────────────────────
+  graphql:
+    graphiql:
+      enabled: true              # Interactive GraphQL IDE at /graphiql
+      path: /graphiql
+    path: /graphql               # Single endpoint for all GraphQL operations
+    schema:
+      locations: classpath:graphql/   # Where to find .graphqls schema files
+      file-extensions: .graphqls,.gqls
+
+# ── HTTP Server (REST + GraphQL) ──────────────────────────────────
+server:
+  port: 8080
+
+# ── gRPC Server ───────────────────────────────────────────────────
+grpc:
+  server:
+    port: 9090                   # gRPC runs on a SEPARATE port from HTTP
+    # In production, add TLS:
+    # security:
+    #   certificate-chain: classpath:cert.pem
+    #   private-key: classpath:key.pem
+
+# ── Actuator (Health, Metrics) ────────────────────────────────────
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+# ── OpenAPI / Swagger ─────────────────────────────────────────────
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+    display-request-duration: true
+  api-docs:
+    path: /v3/api-docs
+
+# ── Logging ───────────────────────────────────────────────────────
+logging:
+  level:
+    com.showcase: DEBUG
+    org.springframework.graphql: INFO
+    io.grpc: INFO
+  pattern:
+    console: "%d{HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

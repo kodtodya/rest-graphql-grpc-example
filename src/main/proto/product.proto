@@ -1,0 +1,104 @@
+syntax = "proto3";
+
+// ─────────────────────────────────────────────────────────────────
+//  gRPC Service Definition  —  product.proto
+// ─────────────────────────────────────────────────────────────────
+//
+//  Protocol Buffers (protobuf) define:
+//   1. The service contract (methods + RPC types)
+//   2. Message shapes (strongly-typed, binary-serialized)
+//
+//  gRPC Communication Patterns (all 4 shown):
+//   - Unary       : client sends 1 request → server sends 1 response
+//   - Server stream: client sends 1 request → server streams many responses
+//   - Client stream: client streams many  → server sends 1 response
+//   - Bidirectional: both sides stream simultaneously
+//
+//  Run `mvn compile` to auto-generate Java classes from this file.
+// ─────────────────────────────────────────────────────────────────
+
+option java_package = "com.kodtodya.practice.grpc";
+option java_outer_classname = "ProductProto";
+option java_multiple_files = true;
+
+package product;
+
+// ── Service Definition ────────────────────────────────────────────
+service ProductService {
+    // UNARY: single request → single response (most common)
+    rpc GetProduct (GetProductRequest) returns (ProductResponse);
+
+    // UNARY: get all products with optional filter
+    rpc ListProducts (ListProductsRequest) returns (ListProductsResponse);
+
+    // UNARY: create a product
+    rpc CreateProduct (CreateProductRequest) returns (ProductResponse);
+
+    // UNARY: update a product
+    rpc UpdateProduct (UpdateProductRequest) returns (ProductResponse);
+
+    // UNARY: delete a product
+    rpc DeleteProduct (DeleteProductRequest) returns (DeleteProductResponse);
+
+    // SERVER STREAMING: client requests → server pushes a stream of products
+    // Use case: large catalog, real-time price updates, event feeds
+    rpc StreamProducts (ListProductsRequest) returns (stream ProductResponse);
+}
+
+// ── Message Types ─────────────────────────────────────────────────
+
+// Protobuf fields: each has a type, name, and unique field number (tag).
+// The TAG is what's serialized (not the name) — very compact binary encoding.
+
+message ProductResponse {
+    int64  id          = 1;
+    string name        = 2;
+    string description = 3;
+    double price       = 4;
+    string category    = 5;
+    int32  stock       = 6;
+    bool   available   = 7;
+    string created_at  = 8;
+    string updated_at  = 9;
+}
+
+message GetProductRequest {
+    int64 id = 1;   // field tag 1; maps to id field in ProductResponse
+}
+
+message ListProductsRequest {
+    string category = 1;   // optional — empty string means "all"
+}
+
+message ListProductsResponse {
+    repeated ProductResponse products = 1;  // "repeated" = list/array
+    int32 total = 2;
+}
+
+message CreateProductRequest {
+    string name        = 1;
+    string description = 2;
+    double price       = 3;
+    string category    = 4;
+    int32  stock       = 5;
+    bool   available   = 6;
+}
+
+message UpdateProductRequest {
+    int64  id          = 1;
+    string name        = 2;
+    string description = 3;
+    double price       = 4;
+    string category    = 5;
+    int32  stock       = 6;
+    bool   available   = 7;
+}
+
+message DeleteProductRequest {
+    int64 id = 1;
+}
+
+message DeleteProductResponse {
+    bool    success = 1;
+    string  message = 2;
+}

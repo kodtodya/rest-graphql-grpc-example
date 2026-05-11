@@ -1,0 +1,82 @@
+# ─────────────────────────────────────────────────────────────────
+#  GraphQL Schema  —  products.graphqls
+# ─────────────────────────────────────────────────────────────────
+#
+#  GraphQL uses a strongly-typed Schema Definition Language (SDL).
+#  Clients specify EXACTLY the fields they need — no over/under-fetching.
+#
+#  Key types:
+#   • Query     → read operations (like GET in REST)
+#   • Mutation  → write operations (like POST/PUT/DELETE in REST)
+#   • Subscription → real-time (not implemented here, but shown)
+# ─────────────────────────────────────────────────────────────────
+
+type Product {
+    id: ID!
+    name: String!
+    description: String
+    price: Float!
+    category: String!
+    stock: Int!
+    available: Boolean!
+    createdAt: String
+    updatedAt: String
+}
+
+# ── Input types (used in mutations) ──────────────────────────────
+input CreateProductInput {
+    name: String!
+    description: String
+    price: Float!
+    category: String!
+    stock: Int
+    available: Boolean
+}
+
+input UpdateProductInput {
+    name: String
+    description: String
+    price: Float
+    category: String
+    stock: Int
+    available: Boolean
+}
+
+# ── Queries (read-only) ───────────────────────────────────────────
+type Query {
+    # Fetch all products (optionally filtered by category)
+    products(category: String): [Product!]!
+
+    # Fetch a single product by ID
+    product(id: ID!): Product
+
+    # Fetch only available products
+    availableProducts: [Product!]!
+
+    # All distinct categories
+    categories: [String!]!
+
+    # Search by name fragment
+    searchProducts(name: String!): [Product!]!
+}
+
+# ── Mutations (write operations) ──────────────────────────────────
+type Mutation {
+    # Create a new product
+    createProduct(input: CreateProductInput!): Product!
+
+    # Update specific fields (partial update — GraphQL style)
+    updateProduct(id: ID!, input: UpdateProductInput!): Product!
+
+    # Update stock only
+    updateStock(id: ID!, stock: Int!): Product!
+
+    # Remove a product
+    deleteProduct(id: ID!): Boolean!
+}
+
+# ── Subscriptions (real-time — illustrative) ──────────────────────
+# type Subscription {
+#     productUpdated(id: ID): Product!
+#     stockChanged: Product!
+# }

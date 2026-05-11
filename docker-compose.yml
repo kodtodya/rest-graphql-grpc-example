@@ -1,0 +1,29 @@
+version: '3.8'
+
+# ─────────────────────────────────────────────────────────────────
+#  Docker Compose — Spring API Showcase
+#
+#  Usage:
+#    docker compose up --build    # build image and start
+#    docker compose up            # start (if already built)
+#    docker compose down          # stop and remove containers
+#    docker compose logs -f app   # tail logs
+# ─────────────────────────────────────────────────────────────────
+
+services:
+  app:
+    build: .
+    container_name: spring-api-showcase
+    ports:
+      - "8080:8080"   # REST + GraphQL + Swagger + H2 Console
+      - "9090:9090"   # gRPC
+    environment:
+      - SPRING_PROFILES_ACTIVE=default
+      - JAVA_OPTS=-Xms256m -Xmx512m
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 45s
+    restart: unless-stopped
